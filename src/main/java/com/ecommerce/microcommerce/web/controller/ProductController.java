@@ -1,6 +1,7 @@
 package com.ecommerce.microcommerce.web.controller;
 
 import com.ecommerce.microcommerce.dao.ProductDao;
+import com.ecommerce.microcommerce.web.exceptions.ProduitGratuitException;
 import com.ecommerce.microcommerce.model.Product;
 import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
 import com.ecommerce.microcommerce.wrapper.ProductMargin;
@@ -88,10 +89,12 @@ public class ProductController {
 
 
     //ajouter un produit
+    @ApiOperation(value = "Ajoute un produit en vérifiant que le prix de vente n’est pas égal à 0.")
     @PostMapping(value = "/Produits")
-
-    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody Product product) {
-
+    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody Product product) throws ProduitGratuitException {
+    	if( product.getPrix() == 0 )
+    		throw new ProduitGratuitException("Le prix de vente ne doit pas être égal à zéro");
+    	
         Product productAdded =  productDao.save(product);
 
         if (productAdded == null)
@@ -106,6 +109,7 @@ public class ProductController {
         return ResponseEntity.created(location).build();
     }
 
+    
     @DeleteMapping (value = "/Produits/{id}")
     public void supprimerProduit(@PathVariable int id) {
 
