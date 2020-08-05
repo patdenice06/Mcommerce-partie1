@@ -3,6 +3,7 @@ package com.ecommerce.microcommerce.web.controller;
 import com.ecommerce.microcommerce.dao.ProductDao;
 import com.ecommerce.microcommerce.model.Product;
 import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
+import com.ecommerce.microcommerce.wrapper.ProductMargin;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,11 +29,24 @@ public class ProductController {
     @Autowired
     private ProductDao productDao;
 
+    
+    //Calcule la marge de chaque produit (différence entre prix d‘achat et prix de vente)
+    @ApiOperation(value = "Calcule la marge de chaque produit (différence entre prix d‘achat et prix de vente)")
+    @GetMapping(value = "/AdminProduits")
+    public List<ProductMargin> calculerMargeProduit() {
+		List<Product> products = productDao.findAll();
+		List<ProductMargin>  productMargins = new ArrayList<ProductMargin>();
+		int margin = 0;
+		for (Product product : products) {
+			margin = product.getPrix() - product.getPrixAchat();
+			productMargins.add( new ProductMargin(product, margin) );
+		}
+		return productMargins;    	
+    }
+    
 
     //Récupérer la liste des produits
-
     @RequestMapping(value = "/Produits", method = RequestMethod.GET)
-
     public MappingJacksonValue listeProduits() {
 
         Iterable<Product> produits = productDao.findAll();
