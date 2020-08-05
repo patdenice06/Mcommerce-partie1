@@ -44,7 +44,15 @@ public class ProductController {
 		return productMargins;    	
     }
     
-
+    
+    // Retourne la liste de tous les produits triés par nom croissant
+    @ApiOperation(value = "Retourne la liste de tous les produits triés par nom croissant")
+    @GetMapping(value = "/TriProduits")
+    public List<Product> trierProduitsParOrdreAlphabetique(){
+    	return productDao.findAllByOrderByNom();
+    }
+    
+    
     //Récupérer la liste des produits
     @RequestMapping(value = "/Produits", method = RequestMethod.GET)
     public MappingJacksonValue listeProduits() {
